@@ -307,7 +307,7 @@ public class RushEndToEndPipeline {
 		//aggregateBuilder.add(DefaultJCasTermAnnotator.createAnnotatorDescription(lookupXml.getAbsolutePath()));
 		aggregateBuilder.add(DefaultJCasTermAnnotator.createAnnotatorDescription(lookupXmlPath));
 		
-		aggregateBuilder.add(LvgAnnotator.createAnnotatorDescription());
+		aggregateBuilder.add(MyLvgAnnotator.createAnnotatorDescription());
 
 		// the following two AEs slow down the pipeline significantly when input file
 		// are large

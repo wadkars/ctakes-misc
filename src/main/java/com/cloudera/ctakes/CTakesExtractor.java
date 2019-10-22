@@ -65,9 +65,10 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 				try {
 					this.pipeline = new RushEndToEndPipeline(LOOKUP_XML);
 					success=true;
+					log.info(" Success after " + failedCount);
 				}catch (Exception e) {
 					try {
-						log.info("Sleeping for 5 seconds");
+						log.info("Sleeping for 5 seconds" + failedCount + "=" + e.getMessage());
 						Thread.currentThread().sleep(5000);
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
