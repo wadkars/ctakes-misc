@@ -1,5 +1,5 @@
 
-##Preliminary steps
+## Preliminary steps
 
 * Create a fake folder to allow the Files Collection Reader to get initialized by executing the following command  `mkdir /tmp/random/` 
 * Create a folder `mkdir /tmp/cTakesExample/cData` . Put all the input files into this folder
