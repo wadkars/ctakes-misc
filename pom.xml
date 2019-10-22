@@ -25,12 +25,43 @@
 	<artifactId>ctakes-misc</artifactId>
     <packaging>jar</packaging>
     <name>Apache cTAKES Temporal Information Extraction</name>
+    	<properties>
+		<skipTests>true</skipTests>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<pig.version>0.17.0</pig.version>
+		<hadoop.version>3.0.0-cdh6.0.0</hadoop.version>
+		<joda.version>2.2</joda.version>
+	</properties>
 	<parent>
 		<groupId>org.apache.ctakes</groupId>
 		<artifactId>ctakes</artifactId>
 		<version>4.0.0</version>
 	</parent>
 	<dependencies>
+	<dependency>
+    <groupId>org.hsqldb</groupId>
+    <artifactId>hsqldb</artifactId>
+    <version>2.5.0</version>
+    
+</dependency>
+			<dependency>
+			<groupId>org.apache.pig</groupId>
+			<artifactId>pig</artifactId>
+			<version>${pig.version}</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-common</artifactId>
+			<version>${hadoop.version}</version>
+		</dependency>
+			
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-mapreduce-client-core</artifactId>
+			<version>${hadoop.version}</version>
+		</dependency>
+	
     <dependency>
       <groupId>org.apache.ctakes</groupId>
       <artifactId>ctakes-temporal</artifactId>
@@ -162,7 +193,9 @@
 	<!-- The below is all necessary to unpack the UMLS resources since they 
 		can't be used from the classpath -->
 	<build>
+		
 		<plugins>
+	<!-- 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -186,9 +219,59 @@
 					</execution>
 				</executions>
 			</plugin>
+			 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<includeScope>runtime</includeScope>
+					<outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
 		</plugins>
+		 <!-- 
 		<pluginManagement>
 			<plugins>
+			
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -213,7 +296,17 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
+			
+							
+	
 			</plugins>
 		</pluginManagement>
+			 -->
 	</build>
+		<repositories>
+		<repository>
+			<id>cloudera</id>
+			<url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+		</repository>
+	</repositories>
 </project>
