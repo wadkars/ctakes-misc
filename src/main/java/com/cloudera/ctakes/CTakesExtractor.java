@@ -27,6 +27,8 @@ import org.apache.uima.collection.metadata.CpeDescription;
  * 
  */
 public class CTakesExtractor extends EvalFunc<Tuple> {
+	
+	public static final String LOOKUP_XML = "/tmp/ctakes-config/sno_rx_16ab-prod.xml";
 	public static final String LOOKUP_XML_PATH = "LOOKUP_XML_PATH";
 	public static final String CONFIG_PROPERTIES_PATH = "CONFIG_PROPERTIES_PATH";
 	public static final String IS_LOCAL = "IS_LOCAL";
@@ -49,7 +51,8 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 			if (myProperties == null) {
 				myProperties = System.getProperties();
 			}
-			String path = myProperties.getProperty(LOOKUP_XML_PATH);
+			//String path = myProperties.getProperty(LOOKUP_XML_PATH);
+			String path = LOOKUP_XML;
 			this.pipeline = new RushEndToEndPipeline(path);
 		}
 
