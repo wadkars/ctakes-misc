@@ -66,6 +66,13 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 					this.pipeline = new RushEndToEndPipeline(LOOKUP_XML);
 					success=true;
 				}catch (Exception e) {
+					try {
+						log.info("Sleeping for 5 seconds");
+						Thread.currentThread().sleep(5000);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					failedCount++;
 					if(failedCount==10) {
 						Throwables.propagate(e);
