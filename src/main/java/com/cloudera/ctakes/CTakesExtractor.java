@@ -45,6 +45,7 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 	 * Initialize the CpeDescription class.
 	 */
 	private void initializeFramework() {
+		/*
 		if (myProperties == null) {
 
 			myProperties = UDFContext.getUDFContext().getClientSystemProps();
@@ -53,13 +54,20 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 			}
 			//String path = myProperties.getProperty(LOOKUP_XML_PATH);
 			String path = LOOKUP_XML;
-			this.pipeline = new RushEndToEndPipeline(path);
+			this.pipeline = new RushEndToEndPipeline(LOOKUP_XML);
+		}
+		*/
+		if(this.pipeline==null) {
+			this.pipeline = new RushEndToEndPipeline(LOOKUP_XML);
 		}
 
 	}
 
 	public void finish() {
-		this.pipeline.close();
+		if(this.pipeline!=null) {
+			this.initializeFramework();
+			this.pipeline.close();
+		}
 	}
 
 	/*
