@@ -279,7 +279,8 @@ public class RushEndToEndPipeline {
 		// String absolutePathToChunkerModel = System.getenv("CTAKES_HOME") +
 
 		//String absolutePathToChunkerModel = "/tmp/ctakes-trunk/trunk/ctakes-chunker-res/src/main/resources/org/apache/ctakes/chunker/models/chunker-model.zip";
-		String absolutePathToChunkerModel = "org/apache/ctakes/chunker/models/chunker-model.zip";
+		String absolutePathToChunkerModel = "/tmp/ctakes-config/org/apache/ctakes/chunker/models/chunker-model.zip";
+		                                     
 		// "ctakes-chunker-res/src/main/resources/org/apache/ctakes/chunker/models/chunk-model.claims-1.5.zip";
 		aggregateBuilder.add(AnalysisEngineFactory.createEngineDescription(Chunker.class,
 				Chunker.CHUNKER_MODEL_FILE_PARAM, FileLocator.locateFile(absolutePathToChunkerModel),
