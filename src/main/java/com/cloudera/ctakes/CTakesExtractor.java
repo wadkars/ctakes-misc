@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.ctakes.pipelines.CTakesResult;
 import org.apache.ctakes.pipelines.RushEndToEndPipeline;
+import org.apache.curator.shaded.com.google.common.base.Throwables;
 import org.apache.pig.EvalFunc;
 import org.apache.pig.data.BagFactory;
 import org.apache.pig.data.DataType;
@@ -58,7 +59,19 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 		}
 		*/
 		if(this.pipeline==null) {
-			this.pipeline = new RushEndToEndPipeline(LOOKUP_XML);
+			int failedCount = 0;
+			boolean success = false;
+			while(!success) {
+				try {
+					this.pipeline = new RushEndToEndPipeline(LOOKUP_XML);
+					success=true;
+				}catch (Exception e) {
+					failedCount++;
+					if(failedCount==10) {
+						Throwables.propagate(e);
+					}
+				}				
+			}
 		}
 
 	}
