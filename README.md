@@ -71,7 +71,7 @@ We'll also need to add SVN,MVN,GIT to checkout the Apache cTAKES code.
 A few sample articles are included in the project under ./sample_data/data .  We'll add this data to the cluster using the following commands.
 
 	$ hdfs dfs -mkdir ./sample_data_txt
-	$ hdfs dfs -put ~/src/hadoop2_ctakes/sample_data/data/* ./sample_data_txt
+	$ hdfs dfs -put ~/src/ctakes-misc/sample_data/data/* ./sample_data_txt
 	$ hdfs dfs -ls ./sample_data_txt
 ## Copy /tmp/ctakes_config to all datanodes in the cluster
 
