@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.ctakes:ctakes-assertion-res:4.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-assertion-res/4.0.1-SNAPSHOT/ctakes-assertion-res-4.0.1-20190426.121300-125.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-assertion-res/4.0.1-SNAPSHOT/ctakes-assertion-res-4.0.1-20190426.121300-125-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-assertion-res/4.0.1-SNAPSHOT/ctakes-assertion-res-4.0.1-20190426.121300-125-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

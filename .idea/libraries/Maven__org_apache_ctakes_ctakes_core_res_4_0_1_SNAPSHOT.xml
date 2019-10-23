@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.ctakes:ctakes-core-res:4.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-core-res/4.0.1-SNAPSHOT/ctakes-core-res-4.0.1-20190426.121439-123.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-core-res/4.0.1-SNAPSHOT/ctakes-core-res-4.0.1-20190426.121439-123-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-core-res/4.0.1-SNAPSHOT/ctakes-core-res-4.0.1-20190426.121439-123-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

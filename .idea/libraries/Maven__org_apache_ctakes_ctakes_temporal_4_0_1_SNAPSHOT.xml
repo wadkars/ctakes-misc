@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.ctakes:ctakes-temporal:4.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-temporal/4.0.1-SNAPSHOT/ctakes-temporal-4.0.1-20190426.123443-117.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-temporal/4.0.1-SNAPSHOT/ctakes-temporal-4.0.1-20190426.123443-117-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-temporal/4.0.1-SNAPSHOT/ctakes-temporal-4.0.1-20190426.123443-117-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

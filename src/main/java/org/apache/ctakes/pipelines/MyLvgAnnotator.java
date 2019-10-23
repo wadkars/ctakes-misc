@@ -638,9 +638,11 @@ public class MyLvgAnnotator extends JCasAnnotator_ImplBase {
 	// Therefore we can no longer let LvgCmdApiResourceImpl use the current working directory to look for 
 	// the lvg properties file or the lvg resources (plural.rul etc.)
 	// Instead we use getResource to find the URL for the lvg.properties file. 
-	final String lvgProperties = "org/apache/ctakes/lvg/data/config/lvg.properties";
+	 String lvgProperties = "org/apache/ctakes/lvg/data/config/lvg.properties";
+	lvgProperties = "/tmp/ctakes-config/org/apache/ctakes/lvg/data/config/lvg.properties";
 	Logger logger = Logger.getLogger(MyLvgAnnotator.class.getName());
-	java.net.URL url = MyLvgAnnotator.class.getClassLoader().getResource(lvgProperties);
+	//java.net.URL url = MyLvgAnnotator.class.getClassLoader().getResource(lvgProperties);
+	java.net.URL url = (new File(lvgProperties)).toURL();
 	if (url!=null) {
 		logger.info("URL for lvg.properties =" + url.getFile());
 	} else {

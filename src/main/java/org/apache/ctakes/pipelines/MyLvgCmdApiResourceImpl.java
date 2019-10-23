@@ -1,5 +1,7 @@
 package org.apache.ctakes.pipelines;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,10 +23,16 @@ package org.apache.ctakes.pipelines;
 
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import gov.nih.nlm.nls.lvg.Api.LvgCmdApi;
 import gov.nih.nlm.nls.lvg.Api.LvgLexItemApi;
 import jline.internal.Log;
+
+import org.apache.commons.configuration2.io.FileLocator;
+import org.apache.commons.io.FileUtils;
 
 import org.apache.ctakes.lvg.resource.LvgCmdApiResource;
 import org.apache.log4j.Logger;
@@ -180,5 +188,26 @@ public class MyLvgCmdApiResourceImpl
 	public LvgLexItemApi getLvgLex() {
 		return lvgLexItem;
 	}
+	public static void main(String[] args) throws IOException {
+		String fileURL = "file:/Users/swadhar/sameeraxiominegit/ctakes-misc/target/ctakes-misc-4.0.0-jar-with-dependencies.jar!/org/apache/ctakes/lvg/data/config/lvg.properties";
+		
+		InputStream in = MyLvgCmdApiResourceImpl.class.getClassLoader().getResourceAsStream(fileURL);
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
 
+		byte[] buffer = new byte[1024];
+		int len;
+
+		// read bytes from the input stream and store them in buffer
+		while ((len = in.read(buffer)) != -1) {
+			// write bytes from the buffer into output stream
+			os.write(buffer, 0, len);
+		}
+
+		System.out.println(os.toByteArray());
+		// We need to use the 3-arg constructor of URI in order to properly escape file system chars
+		 //  URI resolvedURI = new URI(resolvedFileURL.getProtocol(), resolvedFileURL.getPath(), null);
+		//File configFile = new File("file:/Users/swadhar/sameeraxiominegit/ctakes-misc/target/ctakes-misc-4.0.0-jar-with-dependencies.jar!/org/apache/ctakes/lvg/data/config/lvg.properties");
+		//System.out.println(f.getAbsolutePath());
+		//System.out.println(FileUtils.readFileToString(f));
+	}
 }

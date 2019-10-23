@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.ctakes:ctakes-dependency-parser:4.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-dependency-parser/4.0.1-SNAPSHOT/ctakes-dependency-parser-4.0.1-20190426.121508-123.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-dependency-parser/4.0.1-SNAPSHOT/ctakes-dependency-parser-4.0.1-20190426.121508-123-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ctakes/ctakes-dependency-parser/4.0.1-SNAPSHOT/ctakes-dependency-parser-4.0.1-20190426.121508-123-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
