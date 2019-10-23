@@ -105,7 +105,7 @@ First convert all the small files into a smaller set of sequence files
 	$ export NO_OF_REDUCERS=0
 	$ export FILE_SPLIT_SIZE=40000
 	$ ./convert_to_sequence_files.sh ./sample_data_txt ./sample_data_seq $NO_OF_REDUCERS $FILE_SPLIT_SIZE
-	$ ./process_ctakes_hive.sh ./sample_data_seq/ default.ctakes_annotated_docs_dummy default.ctakes_annotated_docs
+	$ ./process_ctakes_hive.sh ./sample_data_seq/ default.ctakes_annotations_docs_dummy default.ctakes_annotations_docs
 
 
 
