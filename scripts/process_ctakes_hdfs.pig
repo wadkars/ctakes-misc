@@ -11,4 +11,3 @@ DEFINE PROCESSPAGE com.cloudera.ctakes.CTakesExtractor();
 A = LOAD '$DOCS_PATH' USING  org.apache.pig.piggybank.storage.SequenceFileLoader() AS (key:chararray,value:chararray);;
 C = FOREACH A GENERATE FLATTEN(PROCESSPAGE($0, $1));
 STORE C  INTO '$ANNOTATIONS_PATH' USING PigStorage('^');
-~
