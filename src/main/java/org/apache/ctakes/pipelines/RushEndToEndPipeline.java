@@ -150,8 +150,15 @@ public class RushEndToEndPipeline {
 	}
 	
 	public CTakesResult getResult(String filePath, int partNo, String fileContent) throws Exception {
+		String xml10pattern = "[^"
+                + "\u0009\r\n"
+                + "\u0020-\uD7FF"
+                + "\uE000-\uFFFD"
+                + "\ud800\udc00-\udbff\udfff"
+                + "]";
+		String legalFC = fileContent.replaceAll(xml10pattern, "");
 		rawFileCas = RushPipeline.initializeCas(fileContentReader, xmiAnnotationEngine);
-		CTakesFilePart part = new CTakesFilePart(filePath, partNo, fileContent);
+		CTakesFilePart part = new CTakesFilePart(filePath, partNo, legalFC);
 		fileContentReader.setConfigParameterValue("ctakesFilePart", part);
 		CTakesResult result = RushPipeline.processCas(rawFileCas, fileContentReader, xmiAnnotationEngine);
 

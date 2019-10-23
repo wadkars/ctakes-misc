@@ -355,6 +355,7 @@ public  class RushPipeline {
       
     }
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    //System.err.println("DD" + cas.getSofaDataString());
     CasIOUtils.save(cas, bos, SerialFormat.XMI);
     return new String(bos.toByteArray());
 
