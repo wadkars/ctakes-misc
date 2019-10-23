@@ -142,7 +142,7 @@ public class RushEndToEndPipeline {
 			fileContentReader = RushFilesCollectionReader.getCollectionReader(FAKE_DIR);
 			
 
-			rawFileCas = RushPipeline.initializeCas(fileContentReader, xmiAnnotationEngine);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			Throwables.propagate(e);
@@ -150,6 +150,7 @@ public class RushEndToEndPipeline {
 	}
 	
 	public CTakesResult getResult(String filePath, int partNo, String fileContent) throws Exception {
+		rawFileCas = RushPipeline.initializeCas(fileContentReader, xmiAnnotationEngine);
 		CTakesFilePart part = new CTakesFilePart(filePath, partNo, fileContent);
 		fileContentReader.setConfigParameterValue("ctakesFilePart", part);
 		CTakesResult result = RushPipeline.processCas(rawFileCas, fileContentReader, xmiAnnotationEngine);

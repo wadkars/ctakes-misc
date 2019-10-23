@@ -77,6 +77,7 @@ public class MyLvgCmdApiResourceImpl
 	    	File configFile = new File(dr.getUri());
 	        configFileName = configFile.getPath();
 	         
+	        
 	        logger.info("Loading NLM Norm and Lvg with config file = " + configFileName);
 	        logger.info("  config file absolute path = " + configFile.getAbsolutePath());
 
