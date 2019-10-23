@@ -73,6 +73,13 @@ A few sample articles are included in the project under ./sample_data/data .  We
 	$ hdfs dfs -mkdir ./sample_data_txt
 	$ hdfs dfs -put ~/src/ctakes-misc/sample_data/data/* ./sample_data_txt
 	$ hdfs dfs -ls ./sample_data_txt
+
+## Create /tmp/random folder on all datanodes in the cluster
+
+
+
+	$ mkdir /tmp/random
+
 ## Copy /tmp/ctakes_config to all datanodes in the cluster
 
 The PIG UDF's will run on the data nodes. Copy the folder "ctakes_config" to all the data nodes in the cluster. My command to do that is. Ensure that the "/tmp/ctakes-config" on all machines has 777 permissions
