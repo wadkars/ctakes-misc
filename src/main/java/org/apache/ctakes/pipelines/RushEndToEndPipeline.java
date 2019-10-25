@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.ctakes.assertion.medfacts.cleartk.PolarityCleartkAnalysisEngine;
@@ -32,6 +33,7 @@ import org.apache.ctakes.typesystem.type.textspan.LookupWindowAnnotation;
 import org.apache.ctakes.typesystem.type.textspan.Segment;
 import org.apache.ctakes.typesystem.type.textspan.Sentence;
 import org.apache.ctakes.utils.Utils;
+import org.apache.tools.ant.util.StringUtils;
 import org.apache.uima.UIMAException;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngine;
@@ -63,6 +65,8 @@ import com.lexicalscope.jewel.cli.CliFactory;
 import com.lexicalscope.jewel.cli.Option;
 
 public class RushEndToEndPipeline {
+	public static final String MASTER_FILE_NAME="db.xml";
+	public static final String TEMPLATE_STRING="$CTAKES_ROOT$";
 
 	static interface Options {
 
@@ -74,11 +78,20 @@ public class RushEndToEndPipeline {
 
 		@Option(longName = "lookupXml")
 		public File getLookupXml();
+		
+		
+		@Option(longName= "masterFolder")
+		public File getMasterFolder();
+		
+		@Option(longName= "tempMasterFolder")
+		public File getTempMasterFolder();
 	}
 
 	public static File inputDirectory; // text files to process
 	public static File outputDirectory; // directory to output xmi files
 	public static File lookupXml;
+	public static File masterFolder;
+	public static File tempMasterFolder;
 	
 	public static void main2(String[] args) throws Exception {
 
@@ -87,6 +100,8 @@ public class RushEndToEndPipeline {
 		outputDirectory = options.getOutputDirectory();
 		lookupXml = options.getLookupXml();
 
+		
+		
 		List<File> files = new ArrayList<File>();
 		for (File file : inputDirectory.listFiles()) {
 			files.add(file);
@@ -185,7 +200,25 @@ public class RushEndToEndPipeline {
 		inputDirectory = options.getInputDirectory();
 		outputDirectory = options.getOutputDirectory();
 		lookupXml = options.getLookupXml();
-		RushEndToEndPipeline pipeline = new RushEndToEndPipeline(lookupXml.getAbsolutePath());
+		masterFolder = options.getMasterFolder();
+		tempMasterFolder = options.getTempMasterFolder();
+		String randomPrefix = Long.toString(Math.abs((new Random()).nextLong()));
+		System.err.println(randomPrefix);
+		if(!tempMasterFolder.exists()) {
+			FileUtils.forceMkdir(tempMasterFolder);
+		}
+		File newConfigFolder = new File(tempMasterFolder,randomPrefix);
+		if(newConfigFolder.exists()) {
+			FileUtils.deleteDirectory(newConfigFolder);
+		}
+		FileUtils.forceMkdir(newConfigFolder);
+		FileUtils.copyDirectory(masterFolder, newConfigFolder);
+		
+		
+		String fContents = FileUtils.readFileToString(lookupXml);
+		File newLookupXml = new File(newConfigFolder,MASTER_FILE_NAME);
+		FileUtils.write(newLookupXml,StringUtils.replace(fContents, TEMPLATE_STRING, newConfigFolder.getAbsolutePath()));
+		RushEndToEndPipeline pipeline = new RushEndToEndPipeline(newLookupXml.getAbsolutePath());
 		for (File file : inputDirectory.listFiles()) {
 			String t = FileUtils.readFileToString(file);
 			CTakesResult result = pipeline.getResult(file.getAbsolutePath(), 1, t);
@@ -194,6 +227,7 @@ public class RushEndToEndPipeline {
 		}
 		System.out.println("Closing Pipeline");
 		pipeline.close();
+		FileUtils.deleteDirectory(newConfigFolder);
 		System.out.println("Closed Pipeline, Now Exiting");
 	}
 
@@ -313,7 +347,7 @@ public class RushEndToEndPipeline {
 				"ActionType", "DELETE", "DeleteAction", new String[] { "selector=B" }));
 		// add UMLS on top of lookup windows
 		//aggregateBuilder.add(DefaultJCasTermAnnotator.createAnnotatorDescription(lookupXml.getAbsolutePath()));
-		aggregateBuilder.add(DefaultJCasTermAnnotator.createAnnotatorDescription(lookupXmlPath));
+		aggregateBuilder.add(RushDefaultJCasTermAnnotator.createAnnotatorDescription(lookupXmlPath));
 		
 		aggregateBuilder.add(MyLvgAnnotator.createAnnotatorDescription());
 

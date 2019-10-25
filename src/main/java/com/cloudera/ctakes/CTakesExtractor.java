@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -19,6 +20,7 @@ import org.apache.pig.data.TupleFactory;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 import org.apache.pig.impl.util.UDFContext;
+import org.apache.tools.ant.util.StringUtils;
 import org.apache.uima.collection.metadata.CpeDescription;
 
 /**
@@ -28,8 +30,11 @@ import org.apache.uima.collection.metadata.CpeDescription;
  * 
  */
 public class CTakesExtractor extends EvalFunc<Tuple> {
-	
-	public static final String LOOKUP_XML = "/tmp/ctakes-config/sno_rx_16ab-prod.xml";
+	public static final String MASTER_FILE_NAME="db.xml";
+	public static final String TEMPLATE_STRING="$CTAKES_ROOT$";
+	public static final String TEMPLATE_LOOKUP_XML = "/tmp/ctakes-config/sno_rx_16ab-test.xml";
+	public static final String MASTER_FOLDER =  "/tmp/ctakes-config/";
+	public static final String LOOKUP_FOLDER = "/tmp/ctakes-config2/";	
 	public static final String LOOKUP_XML_PATH = "LOOKUP_XML_PATH";
 	public static final String CONFIG_PROPERTIES_PATH = "CONFIG_PROPERTIES_PATH";
 	public static final String IS_LOCAL = "IS_LOCAL";
@@ -44,7 +49,34 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 	// String pipelinePath = "";
 	/**
 	 * Initialize the CpeDescription class.
+	 * @throws Exception 
 	 */
+	File newConfigFolder = null;
+	private File createConfigFolderForTask()  {
+		try {
+			File tempMasterFolder = new File(LOOKUP_FOLDER);
+			String randomPrefix = Long.toString(Math.abs((new Random()).nextLong()));
+			System.err.println(randomPrefix);
+			if(!tempMasterFolder.exists()) {
+				FileUtils.forceMkdir(tempMasterFolder);
+			}
+			newConfigFolder = new File(tempMasterFolder,randomPrefix);
+			if(newConfigFolder.exists()) {
+				FileUtils.deleteDirectory(newConfigFolder);
+			}
+			FileUtils.forceMkdir(newConfigFolder);
+			FileUtils.copyDirectory(new File(MASTER_FOLDER), newConfigFolder);
+			
+			
+			String fContents = FileUtils.readFileToString(new File(TEMPLATE_LOOKUP_XML));
+			File newLookupXml = new File(newConfigFolder,MASTER_FILE_NAME);
+			FileUtils.write(newLookupXml,StringUtils.replace(fContents, TEMPLATE_STRING, newConfigFolder.getAbsolutePath()));
+			return newLookupXml;	
+		}catch(Exception ex) {
+			Throwables.propagate(ex);
+		}
+		return null;
+	}
 	private void initializeFramework() {
 		/*
 		if (myProperties == null) {
@@ -59,11 +91,12 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 		}
 		*/
 		if(this.pipeline==null) {
+			File lookupXML = createConfigFolderForTask();
 			int failedCount = 0;
 			boolean success = false;
 			while(!success) {
 				try {
-					this.pipeline = new RushEndToEndPipeline(LOOKUP_XML);
+					this.pipeline = new RushEndToEndPipeline(lookupXML.getAbsolutePath());
 					success=true;
 					log.info(" Success after " + failedCount);
 				}catch (Exception e) {
@@ -86,8 +119,16 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 
 	public void finish() {
 		if(this.pipeline!=null) {
-			this.initializeFramework();
+			//this.initializeFramework();
 			this.pipeline.close();
+			try {
+				FileUtils.deleteDirectory(newConfigFolder);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				Throwables.propagate(e);
+			}
+			this.pipeline = null;
+			
 		}
 	}
 
@@ -188,5 +229,6 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 		// System.err.println(o.get(2));
 		// System.out.println(o.size());
 		//FileUtils.writeStringToFile(new File("/tmp/CTAKES_DATA/output/test.xml"), (String) o.get(4));
+		p.finish();
 	}
 }

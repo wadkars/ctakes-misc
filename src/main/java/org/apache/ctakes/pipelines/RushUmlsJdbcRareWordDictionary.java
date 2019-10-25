@@ -23,7 +23,7 @@ public class RushUmlsJdbcRareWordDictionary implements RareWordDictionary{
 	         throw new SQLException( "Invalid User for UMLS dictionary " + name );
 	      }
 	      */
-	      _delegateDictionary = new JdbcRareWordDictionary( name, uimaContext, properties );
+	      _delegateDictionary = new RushJDBCRareWordDictionary( name, uimaContext, properties );
 	   }
 
 
@@ -40,7 +40,8 @@ public class RushUmlsJdbcRareWordDictionary implements RareWordDictionary{
 	    */
 	   @Override
 	   public Collection<RareWordTerm> getRareWordHits( final FastLookupToken fastLookupToken ) {
-	      return _delegateDictionary.getRareWordHits( fastLookupToken );
+	      Collection<RareWordTerm> ret = _delegateDictionary.getRareWordHits( fastLookupToken );
+	      return ret;
 	   }
 
 	   /**
@@ -48,7 +49,11 @@ public class RushUmlsJdbcRareWordDictionary implements RareWordDictionary{
 	    */
 	   @Override
 	   public Collection<RareWordTerm> getRareWordHits( final String rareWordText ) {
-	      return _delegateDictionary.getRareWordHits( rareWordText );
+		   Collection<RareWordTerm> ret = _delegateDictionary.getRareWordHits( rareWordText );
+		   return ret;
 	   }
 
+	   public void close() {
+		  ((RushJDBCRareWordDictionary) _delegateDictionary).close();
+	   }
 }
