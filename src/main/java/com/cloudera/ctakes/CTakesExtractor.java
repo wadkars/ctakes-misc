@@ -34,7 +34,7 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 	public static final String TEMPLATE_STRING="$CTAKES_ROOT$";
 	public static final String TEMPLATE_LOOKUP_XML = "/tmp/ctakes-config/sno_rx_16ab-test.xml";
 	public static final String MASTER_FOLDER =  "/tmp/ctakes-config/";
-	public static final String LOOKUP_FOLDER = "/opt/ctakes-config/";	
+	public static final String LOOKUP_FOLDER = "/logs/ctakes-config/";	
 	public static final String LOOKUP_XML_PATH = "LOOKUP_XML_PATH";
 	public static final String CONFIG_PROPERTIES_PATH = "CONFIG_PROPERTIES_PATH";
 	public static final String IS_LOCAL = "IS_LOCAL";
@@ -211,7 +211,7 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 		// position of your nose makes your nasal bones, cartilage, and soft tissue
 		// particularly vulnerable to external injuries");
 
-		String s = FileUtils.readFileToString(new File("/tmp/cTakesExample/cData/4490.txt"));
+		String s = FileUtils.readFileToString(new File("/tmp/cTakesExample/cData/10380.txt"));
 		// System.out.println(s);
 		l.add(s);
 		Tuple t = tf.newTuple(l);
