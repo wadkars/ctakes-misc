@@ -46,27 +46,36 @@ public  class CuisWriter extends JCasAnnotator_ImplBase {
 
       List<String> cuis = new ArrayList<>();
       for (EventMention eventMention : JCasUtil.select(jCas, EventMention.class)) {
-        // String text = eventMention.getCoveredText().toLowerCase().replaceAll(" ", "_");
-        // String semanticType = eventMention.getClass().getSimpleName();
-        // int polarity = eventMention.getPolarity();
+         String text = eventMention.getCoveredText().toLowerCase().replaceAll(" ", "_");
+         String semanticType = eventMention.getClass().getSimpleName();
+         int polarity = eventMention.getPolarity();
         for(String code : getOntologyConceptCodes(eventMention)) {
           // String output = String.format("%s|%s|%s", code, text, semanticType);
           String output = String.format("%s", code);
+         
+          if(polarity==-1) {
+        	  output = "N"+output;
+          }
+          //System.out.println(text + "=" + output);
+          //System.out.println(semanticType + "=" + output);
           cuis.add(output);
         }
       }
-
+/*
       for (EntityMention entityMention : JCasUtil.select(systemView, EntityMention.class)) {
         // String text = entityMention.getCoveredText().toLowerCase().replaceAll(" ", "_");
         // String semanticType = entityMention.getClass().getSimpleName();
-        // int polarity = entityMention.getPolarity();
+         int polarity = entityMention.getPolarity();
         for(String code : getOntologyConceptCodes(entityMention)) {
           // String output = String.format("%s|%s|%s", code, text, semanticType);
           String output = String.format("%s", code);
+          if(polarity==-1) {
+        	  output = "N"+output;
+          }
           cuis.add(output);
         }
       }
-
+*/
       File noteFile = new File(ViewUriUtil.getURI(jCas).toString());
       String fileName = noteFile.getName();
       String outputString = String.join(" ", cuis);

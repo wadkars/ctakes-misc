@@ -200,7 +200,7 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 		// position of your nose makes your nasal bones, cartilage, and soft tissue
 		// particularly vulnerable to external injuries");
 
-		String s = FileUtils.readFileToString(new File("/tmp/cTakesExample/cData/1.txt"));
+		String s = FileUtils.readFileToString(new File("/tmp/cTakesExample/cData/2.txt"));
 		// System.out.println(s);
 		l.add(s);
 		Tuple t = tf.newTuple(l);
