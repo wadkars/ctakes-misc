@@ -11,8 +11,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.ctakes.pipelines.CTakesResult;
 import org.apache.ctakes.pipelines.RushEndToEndPipeline;
+import org.apache.ctakes.utils.RushConfig;
 import org.apache.ctakes.utils.RushFileUtils;
 import org.apache.curator.shaded.com.google.common.base.Throwables;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.pig.EvalFunc;
 import org.apache.pig.data.BagFactory;
 import org.apache.pig.data.DataType;
@@ -31,73 +33,56 @@ import org.apache.uima.collection.metadata.CpeDescription;
  * 
  */
 public class CTakesExtractor extends EvalFunc<Tuple> {
-	public static final String MASTER_FILE_NAME="db.xml";
-	public static final String TEMPLATE_STRING="$CTAKES_ROOT$";
-	public static final String TEMPLATE_LOOKUP_XML = "/tmp/ctakes-config/sno_rx_16ab-test.xml";
-	public static final String MASTER_FOLDER =  "/tmp/ctakes-config/";
-	public static final String LOOKUP_FOLDER = "/logs/ctakes-config/";	
-	public static final String LOOKUP_XML_PATH = "LOOKUP_XML_PATH";
-	public static final String CONFIG_PROPERTIES_PATH = "CONFIG_PROPERTIES_PATH";
-	public static final String IS_LOCAL = "IS_LOCAL";
-	private static final int MAX_TIMEOUT_MS = 10 * 60 * 1000; // 1 min
+	
+	
+	public static final String MASTER_CONFIG_FOLDER_KEY = "MASTER_CONFIG_FOLDER";
+	public static final String TMP_CONFIG_FOLDER_KEY = "TMP_CONFIG_FOLDER";
+	
 	TupleFactory tf = TupleFactory.getInstance();
 	BagFactory bf = BagFactory.getInstance();
 	long numTuplesProcessed = 0;
 	CpeDescription cpeDesc = null;
 	Properties myProperties = null;
 	private transient RushEndToEndPipeline pipeline = null;
-
+	private transient RushConfig config = null;
+	private String masterConfigPath = "";
+	private String tmpConfigPath = "";
 	// String pipelinePath = "";
 	/**
 	 * Initialize the CpeDescription class.
 	 * @throws Exception 
 	 */
-	File newConfigFolder = null;
-	private File createConfigFolderForTask()  {
-		try {
-			File tempMasterFolder = new File(LOOKUP_FOLDER);
-			String randomPrefix = Long.toString(Math.abs((new Random()).nextLong()));
-			System.err.println(randomPrefix);
-			if(!tempMasterFolder.exists()) {
-				FileUtils.forceMkdir(tempMasterFolder);
-			}
-			newConfigFolder = new File(tempMasterFolder,randomPrefix);
-			if(newConfigFolder.exists()) {
-				FileUtils.deleteDirectory(newConfigFolder);
-			}
-			FileUtils.forceMkdir(newConfigFolder);
-			FileUtils.copyDirectory(new File(MASTER_FOLDER), newConfigFolder);
-			
-			
-			String fContents = FileUtils.readFileToString(new File(TEMPLATE_LOOKUP_XML));
-			File newLookupXml = new File(newConfigFolder,MASTER_FILE_NAME);
-			FileUtils.write(newLookupXml,StringUtils.replace(fContents, TEMPLATE_STRING, newConfigFolder.getAbsolutePath()));
-			return newLookupXml;	
-		}catch(Exception ex) {
-			Throwables.propagate(ex);
-		}
-		return null;
+	
+	public CTakesExtractor(String masterConfigPath, String tmpConfigPath) {
+		this.masterConfigPath = masterConfigPath;
+		this.tmpConfigPath = tmpConfigPath;
 	}
+
 	private void initializeFramework() {
 		/*
 		if (myProperties == null) {
 
-			myProperties = UDFContext.getUDFContext().getClientSystemProps();
-			if (myProperties == null) {
+			Configuration conf = UDFContext.getUDFContext().getJobConf();
+			if (conf == null) {
 				myProperties = System.getProperties();
+			}else {
+				myProperties.put(MASTER_CONFIG_FOLDER_KEY, conf.get(MASTER_CONFIG_FOLDER_KEY));
+				myProperties.put(TMP_CONFIG_FOLDER_KEY, conf.get(TMP_CONFIG_FOLDER_KEY));
 			}
-			//String path = myProperties.getProperty(LOOKUP_XML_PATH);
-			String path = LOOKUP_XML;
-			this.pipeline = new RushEndToEndPipeline(LOOKUP_XML);
+
+			//this.pipeline = new RushEndToEndPipeline(this.myProperties.getProperty(MASTER_CONFIG_FOLDER_KEY,TMP_CONFIG_FOLDER_KEY));
 		}
 		*/
 		if(this.pipeline==null) {
-			File lookupXML = createConfigFolderForTask();
+			this.config = new RushConfig(this.masterConfigPath,
+                    this.tmpConfigPath);
+			this.config.initialize();
+			
 			int failedCount = 0;
 			boolean success = false;
 			while(!success) {
 				try {
-					this.pipeline = new RushEndToEndPipeline(lookupXML.getAbsolutePath());
+					this.pipeline = new RushEndToEndPipeline(this.config);
 					success=true;
 					log.info(" Success after " + failedCount);
 				}catch (Exception e) {
@@ -122,14 +107,8 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 		if(this.pipeline!=null) {
 			//this.initializeFramework();
 			this.pipeline.close();
-			try {
-				FileUtils.deleteDirectory(newConfigFolder);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				Throwables.propagate(e);
-			}
-			this.pipeline = null;
-			
+			this.config.close();
+
 		}
 	}
 
@@ -204,7 +183,10 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 	}
 
 	public static void main(String[] args) throws Exception {
-		CTakesExtractor p = new CTakesExtractor();
+		Properties myProperties = System.getProperties();
+
+		CTakesExtractor p = new CTakesExtractor(myProperties.getProperty(MASTER_CONFIG_FOLDER_KEY),
+				myProperties.getProperty(TMP_CONFIG_FOLDER_KEY));
 		TupleFactory tf = TupleFactory.getInstance();
 		List<String> l = new ArrayList<>();
 		l.add("/tmp/cTakesExample/cData/4490.txt-1");
@@ -213,7 +195,7 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 		// position of your nose makes your nasal bones, cartilage, and soft tissue
 		// particularly vulnerable to external injuries");
 
-		String s = FileUtils.readFileToString(new File("/tmp/cTakesExample/cData/10380.txt"));
+		String s = FileUtils.readFileToString(new File("/tmp/cTakesExample/cData/1.txt"));
 		// System.out.println(s);
 		l.add(s);
 		Tuple t = tf.newTuple(l);
@@ -224,7 +206,7 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 		//System.err.println(o.get(2));
 		//System.err.println(o.get(3));
 		//System.err.println(o.get(4));
-		//System.err.println(o.get(5));
+		System.err.println(o.get(5));
 		// System.out.println(o.get(2));
 		// System.out.println(o.get(3));
 		// System.err.println(o.get(1));

@@ -4,10 +4,11 @@
 * Create a fake folder to allow the Files Collection Reader to get initialized by executing the following command  `mkdir /tmp/random/` 
 * Create a folder `mkdir /tmp/cTakesExample/cData` . Put all the input files into this folder
 * Create a folder `mkdir /tmp/ctakes-config` and copy all the contents of "./resources/" into this folder
+* Create a folder `mkdir /tmp/ctakes-config2`
 * Run the following command
 
 `
-mvn exec:java -Dexec.mainClass="org.apache.ctakes.pipelines.RushEndToEndPipeline" -Dexec.args="--input-dir /tmp/cTakesExample/cData --output-dir /tmp/cTakesExample/ --lookupXml ./resources/sno_rx_16ab-local.xml"
+mvn exec:java -Dexec.mainClass="org.apache.ctakes.pipelines.RushEndToEndPipeline" -Dexec.args="--input-dir /tmp/cTakesExample/cData --output-dir /tmp/cTakesExample/ --masterFolder /tmp/ctakes-config/ --tempMasterFolder /tmp/ctakes-config2/"
 `
 * This will produce two folder /tmp/cTakesExample/xmis and /tmp/cTakesExample/cuis/ and place the respect XMI and CUI's into it.
 
@@ -74,11 +75,12 @@ A few sample articles are included in the project under ./sample_data/data .  We
 	$ hdfs dfs -put ~/src/ctakes-misc/sample_data/data/* ./sample_data_txt
 	$ hdfs dfs -ls ./sample_data_txt
 
-## Create /tmp/random folder on all datanodes in the cluster
+## Create the following folders on all datanodes in the cluster
 
 
 
 	$ mkdir /tmp/random
+	$ mkdir /logs/ctakes-config
 
 ## Copy /tmp/ctakes_config to all datanodes in the cluster
 
@@ -105,7 +107,7 @@ First convert all the small files into a smaller set of sequence files
 	$ export NO_OF_REDUCERS=0
 	$ export FILE_SPLIT_SIZE=40000
 	$ ./convert_to_sequence_files.sh ./sample_data_txt ./sample_data_seq $NO_OF_REDUCERS $FILE_SPLIT_SIZE
-	$ ./process_ctakes_hive.sh ./sample_data_seq/ default.ctakes_annotations_docs_dummy default.ctakes_annotations_docs
+	$ ./process_ctakes_hive.sh ./sample_data_seq/ default.ctakes_annotations_docs_dummy default.ctakes_annotations_docs /tmp/ctakes-config /logs/ctakes-config
 
 
 

@@ -32,6 +32,7 @@ import org.apache.ctakes.typesystem.type.syntax.Chunk;
 import org.apache.ctakes.typesystem.type.textspan.LookupWindowAnnotation;
 import org.apache.ctakes.typesystem.type.textspan.Segment;
 import org.apache.ctakes.typesystem.type.textspan.Sentence;
+import org.apache.ctakes.utils.RushConfig;
 import org.apache.ctakes.utils.Utils;
 import org.apache.tools.ant.util.StringUtils;
 import org.apache.uima.UIMAException;
@@ -76,8 +77,7 @@ public class RushEndToEndPipeline {
 		@Option(longName = "output-dir")
 		public File getOutputDirectory();
 
-		@Option(longName = "lookupXml")
-		public File getLookupXml();
+
 		
 		
 		@Option(longName= "masterFolder")
@@ -89,69 +89,24 @@ public class RushEndToEndPipeline {
 
 	public static File inputDirectory; // text files to process
 	public static File outputDirectory; // directory to output xmi files
-	public static File lookupXml;
-	public static File masterFolder;
-	public static File tempMasterFolder;
+	//public static File lookupXml;
+	//public static File masterFolder;
+	public  File tempMasterFolder;
 	
-	public static void main2(String[] args) throws Exception {
 
-		Options options = CliFactory.parseArguments(Options.class, args);
-		inputDirectory = options.getInputDirectory();
-		outputDirectory = options.getOutputDirectory();
-		lookupXml = options.getLookupXml();
-
-		
-		
-		List<File> files = new ArrayList<File>();
-		for (File file : inputDirectory.listFiles()) {
-			files.add(file);
-		}
-
-		CollectionReader reader = UriCollectionReader.getCollectionReaderFromFiles(files);
-		CollectionReader reader2 = RushFilesCollectionReader.getCollectionReader(inputDirectory.getAbsolutePath());
-		CollectionReader reader4 = FilesCollectionReader.getCollectionReader(inputDirectory.getAbsolutePath());
-
-		// SingleFileCollectionReader reader5 =
-		// RushFilesCollectionReader.createReaderDescription(SingleFileCollectionReader.class,null,null)
-
-		SingleFileCollectionReader reader3 = new SingleFileCollectionReader();
-
-		String t = FileUtils.readFileToString(new File("/tmp/cTakesExample/cData/", "10380.txt"));
-		CTakesFilePart part = new CTakesFilePart("10380.txt", 1, t);
-		reader3.setFileToProcess(part);
-		// Cloudera
-		reader2.setConfigParameterValue("FileContent", part.getInput());
-		AnalysisEngine engine = getXMIWritingPreprocessorAggregateBuilder().createAggregate();
-
-		Map<String, String> output = RushPipeline.runPipeline(reader2, engine);
-		for (String k : output.keySet()) {
-			System.err.println(k);
-			FileUtils.write(new File(outputDirectory, (new File(k).getName())), output.get(k));
-		}
-
-		/*
-		 * for(File f:files) { System.err.println("Processing File " +
-		 * f.getAbsolutePath()); String content = FileUtils.readFileToString(f); String
-		 * fName = f.getAbsolutePath(); CTakesFilePart part = new
-		 * CTakesFilePart(fName,1,content); SingleFileCollectionReader reader2 = new
-		 * SingleFileCollectionReader(); reader2.setFileToProcess(part); AnalysisEngine
-		 * engine2 = getXMIWritingPreprocessorAggregateBuilder().createAggregate(); //
-		 * AnalysisEngine engine = getFastPipeline().createAggregate();
-		 * //reader2.getNext(); RushPipeline.runPipeline(reader2, engine2); }
-		 */
-	}
-	
 	public static final String FAKE_DIR = "/tmp/random/";
 			
 	private transient AnalysisEngine xmiAnnotationEngine;
 	private transient AnalysisEngine cuisAnnotationConsumer;
 	private transient CollectionReader fileContentReader;
 	private transient CAS rawFileCas;
-	private static String lookupXmlPath;
-	
-	public RushEndToEndPipeline(String lookupXmlFolderPath) {
+	private  String lookupXmlPath;
+	private String masterFolder;
+
+	public RushEndToEndPipeline(RushConfig config) {
 		try {
-			lookupXmlPath = lookupXmlFolderPath;
+			this.lookupXmlPath = config.getLookupXml().getAbsolutePath();
+			masterFolder = config.getMasterRoot().getAbsolutePath();
 			xmiAnnotationEngine = getXMIWritingPreprocessorAggregateBuilder().createAggregate();
 			cuisAnnotationConsumer = AnalysisEngineFactory.createEngine(CuisWriter.class);
 			fileContentReader = RushFilesCollectionReader.getCollectionReader(FAKE_DIR);
@@ -199,26 +154,15 @@ public class RushEndToEndPipeline {
 		Options options = CliFactory.parseArguments(Options.class, args);
 		inputDirectory = options.getInputDirectory();
 		outputDirectory = options.getOutputDirectory();
-		lookupXml = options.getLookupXml();
-		masterFolder = options.getMasterFolder();
-		tempMasterFolder = options.getTempMasterFolder();
-		String randomPrefix = Long.toString(Math.abs((new Random()).nextLong()));
-		System.err.println(randomPrefix);
-		if(!tempMasterFolder.exists()) {
-			FileUtils.forceMkdir(tempMasterFolder);
-		}
-		File newConfigFolder = new File(tempMasterFolder,randomPrefix);
-		if(newConfigFolder.exists()) {
-			FileUtils.deleteDirectory(newConfigFolder);
-		}
-		FileUtils.forceMkdir(newConfigFolder);
-		FileUtils.copyDirectory(masterFolder, newConfigFolder);
-		
-		
-		String fContents = FileUtils.readFileToString(lookupXml);
-		File newLookupXml = new File(newConfigFolder,MASTER_FILE_NAME);
-		FileUtils.write(newLookupXml,StringUtils.replace(fContents, TEMPLATE_STRING, newConfigFolder.getAbsolutePath()));
-		RushEndToEndPipeline pipeline = new RushEndToEndPipeline(newLookupXml.getAbsolutePath());
+		//lookupXml = options.getLookupXml();
+		File masterFolder = options.getMasterFolder();
+		File tempMasterFolder = options.getTempMasterFolder();
+
+		RushConfig config = new RushConfig(masterFolder.getAbsolutePath(),
+				tempMasterFolder.getAbsolutePath()); 
+		config.initialize();
+		RushEndToEndPipeline pipeline = new RushEndToEndPipeline(config);
+
 		for (File file : inputDirectory.listFiles()) {
 			String t = FileUtils.readFileToString(file);
 			CTakesResult result = pipeline.getResult(file.getAbsolutePath(), 1, t);
@@ -227,59 +171,12 @@ public class RushEndToEndPipeline {
 		}
 		System.out.println("Closing Pipeline");
 		pipeline.close();
-		FileUtils.deleteDirectory(newConfigFolder);
+		config.close();
+		//FileUtils.deleteDirectory(newConfigFolder);
 		System.out.println("Closed Pipeline, Now Exiting");
 	}
 
-	public static void main_working(String[] args) throws Exception {
-
-		Options options = CliFactory.parseArguments(Options.class, args);
-		inputDirectory = options.getInputDirectory();
-		outputDirectory = options.getOutputDirectory();
-		lookupXml = options.getLookupXml();
-		lookupXmlPath = lookupXml.getAbsolutePath();
-		// List<File> files = new ArrayList<File>();
-		AnalysisEngine engine = getXMIWritingPreprocessorAggregateBuilder().createAggregate();
-		AnalysisEngine annotationConsumer = AnalysisEngineFactory.createEngine(CuisWriter.class);
-		CollectionReader reader = RushFilesCollectionReader.getCollectionReader("/tmp/random/");
-		CollectionReader cuisReader = RushFilesCollectionReader.getCollectionReader("/tmp/random/");
-		CAS cas = RushPipeline.initializeCas(reader, engine);
-		// CAS cuisCas = RushPipeline.initializeCas(cuisReader, annotationConsumer);
-
-		// cuisCas.createView("RESULT_VIEW");
-		for (File file : inputDirectory.listFiles()) {
-			String t = FileUtils.readFileToString(file);
-			CTakesFilePart part = new CTakesFilePart(file.getName(), 1, t);
-			reader.setConfigParameterValue("ctakesFilePart", part);
-			CTakesResult result = RushPipeline.processCas(cas, reader, engine);
-			FileUtils.write(new File(outputDirectory, file.getName()), result.getOutput());
-
-			// CTakesFilePart outPart = new
-			// CTakesFilePart(file.getName(),1,result.getOutput());
-			cuisReader.setConfigParameterValue("ctakesFilePart", part);
-			// RushPipeline.processCuisCas(cuisCas, cuisReader, annotationConsumer);
-			// cas.createView("XML_INPUT").setDocumentText(result.getOutput());
-			// cas.
-			// annotationConsumer.process(cas);
-			// String cuisResult = ((CuisWriter)annotationConsumer).getResult();
-			System.err.println("####");
-			// CuisWriter writer = new CuisWriter();
-			// writer.process((JCas) cas);
-			CollectionReader xmlCollectionReader = Utils.getCollectionReader(result.getOutput());
-			// AnalysisEngine annotationConsumer2 =
-			// AnalysisEngineFactory.createEngine(CuisWriter.class);
-			// ((PrimitiveAnalysisEngine_impl)annotationConsumer).getAnalysisComponent();
-			// annotationConsumer.setConfigParameterValue("result", result);
-			String cuis = RushSimplePipeline.runPipeline(xmlCollectionReader, annotationConsumer);
-			result.setCuis(cuis);
-			FileUtils.write(new File("/tmp/cTakesExample/cuis/", file.getName()), result.getCuis());
-			cas.reset();
-			// System.err.println(cuisResult);
-			// files.add(file);
-		}
-		RushPipeline.close(engine);
-
-	}
+	
 
 	protected static AggregateBuilder getFastPipeline() throws Exception {
 
@@ -290,7 +187,7 @@ public class RushEndToEndPipeline {
 		return aggregateBuilder;
 	}
 
-	protected static AggregateBuilder getXMIWritingPreprocessorAggregateBuilder() throws Exception {
+	protected  AggregateBuilder getXMIWritingPreprocessorAggregateBuilder() throws Exception {
 		AggregateBuilder aggregateBuilder = new AggregateBuilder();
 		aggregateBuilder.add(AnalysisEngineFactory.createEngineDescription(RushURIToDocumentTextAnnotator.class));
 
@@ -321,7 +218,7 @@ public class RushEndToEndPipeline {
 		// String absolutePathToChunkerModel = System.getenv("CTAKES_HOME") +
 
 		//String absolutePathToChunkerModel = "/tmp/ctakes-trunk/trunk/ctakes-chunker-res/src/main/resources/org/apache/ctakes/chunker/models/chunker-model.zip";
-		String absolutePathToChunkerModel = "/tmp/ctakes-config/org/apache/ctakes/chunker/models/chunker-model.zip";
+		String absolutePathToChunkerModel = masterFolder + "/org/apache/ctakes/chunker/models/chunker-model.zip";
 		                                     
 		// "ctakes-chunker-res/src/main/resources/org/apache/ctakes/chunker/models/chunk-model.claims-1.5.zip";
 		aggregateBuilder.add(AnalysisEngineFactory.createEngineDescription(Chunker.class,
@@ -353,12 +250,12 @@ public class RushEndToEndPipeline {
 
 		// the following two AEs slow down the pipeline significantly when input file
 		// are large
-		// aggregateBuilder.add(
-		// PolarityCleartkAnalysisEngine.createAnnotatorDescription() );
-		// aggregateBuilder.add(
-		// UncertaintyCleartkAnalysisEngine.createAnnotatorDescription() );
+		 aggregateBuilder.add(
+		 PolarityCleartkAnalysisEngine.createAnnotatorDescription() );
+		 aggregateBuilder.add(
+		 UncertaintyCleartkAnalysisEngine.createAnnotatorDescription() );
 
-		aggregateBuilder.add(AnalysisEngineFactory.createEngineDescription("desc/NegationAnnotator"));
+		//aggregateBuilder.add(AnalysisEngineFactory.createEngineDescription("desc/NegationAnnotator"));
 
 		// write out the CAS after all the above annotations //Write to Spark Output
 		// context directly from here
