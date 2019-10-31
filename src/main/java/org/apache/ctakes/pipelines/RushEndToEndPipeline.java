@@ -250,12 +250,13 @@ public class RushEndToEndPipeline {
 
 		// the following two AEs slow down the pipeline significantly when input file
 		// are large
-		 aggregateBuilder.add(
+		/*
+		aggregateBuilder.add(
 		 PolarityCleartkAnalysisEngine.createAnnotatorDescription() );
 		 aggregateBuilder.add(
 		 UncertaintyCleartkAnalysisEngine.createAnnotatorDescription() );
-
-		//aggregateBuilder.add(AnalysisEngineFactory.createEngineDescription("desc/NegationAnnotator"));
+*/
+		aggregateBuilder.add(AnalysisEngineFactory.createEngineDescription("desc/NegationAnnotator"));
 
 		// write out the CAS after all the above annotations //Write to Spark Output
 		// context directly from here
