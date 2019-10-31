@@ -47,15 +47,17 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 	private transient RushConfig config = null;
 	private String masterConfigPath = "";
 	private String tmpConfigPath = "";
+	private boolean useDefaultNegationAnnotators = true;
 	// String pipelinePath = "";
 	/**
 	 * Initialize the CpeDescription class.
 	 * @throws Exception 
 	 */
 	
-	public CTakesExtractor(String masterConfigPath, String tmpConfigPath) {
+	public CTakesExtractor(String masterConfigPath, String tmpConfigPath, String useDefaultNegationAnnotators) {
 		this.masterConfigPath = masterConfigPath;
 		this.tmpConfigPath = tmpConfigPath;
+		this.useDefaultNegationAnnotators = Boolean.parseBoolean(useDefaultNegationAnnotators);
 	}
 
 	private void initializeFramework() {
@@ -82,7 +84,7 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 			boolean success = false;
 			while(!success) {
 				try {
-					this.pipeline = new RushEndToEndPipeline(this.config);
+					this.pipeline = new RushEndToEndPipeline(this.config,this.useDefaultNegationAnnotators);
 					success=true;
 					log.info(" Success after " + failedCount);
 				}catch (Exception e) {
@@ -184,9 +186,12 @@ public class CTakesExtractor extends EvalFunc<Tuple> {
 
 	public static void main(String[] args) throws Exception {
 		Properties myProperties = System.getProperties();
-
+		boolean b = Boolean.parseBoolean("true");
+		System.out.println(b);
+		b = Boolean.parseBoolean("false");
+		System.out.println(b);
 		CTakesExtractor p = new CTakesExtractor(myProperties.getProperty(MASTER_CONFIG_FOLDER_KEY),
-				myProperties.getProperty(TMP_CONFIG_FOLDER_KEY));
+				myProperties.getProperty(TMP_CONFIG_FOLDER_KEY),"false");
 		TupleFactory tf = TupleFactory.getInstance();
 		List<String> l = new ArrayList<>();
 		l.add("/tmp/cTakesExample/cData/4490.txt-1");

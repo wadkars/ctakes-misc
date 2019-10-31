@@ -102,10 +102,12 @@ public class RushEndToEndPipeline {
 	private transient CAS rawFileCas;
 	private  String lookupXmlPath;
 	private String masterFolder;
+	private boolean useDefaultForNegationAnnotations = true;
 
-	public RushEndToEndPipeline(RushConfig config) {
+	public RushEndToEndPipeline(RushConfig config,boolean useDefaultForNegationAnnotations) {
 		try {
 			this.lookupXmlPath = config.getLookupXml().getAbsolutePath();
+			this.useDefaultForNegationAnnotations = useDefaultForNegationAnnotations;
 			masterFolder = config.getMasterRoot().getAbsolutePath();
 			xmiAnnotationEngine = getXMIWritingPreprocessorAggregateBuilder().createAggregate();
 			cuisAnnotationConsumer = AnalysisEngineFactory.createEngine(CuisWriter.class);
@@ -161,7 +163,7 @@ public class RushEndToEndPipeline {
 		RushConfig config = new RushConfig(masterFolder.getAbsolutePath(),
 				tempMasterFolder.getAbsolutePath()); 
 		config.initialize();
-		RushEndToEndPipeline pipeline = new RushEndToEndPipeline(config);
+		RushEndToEndPipeline pipeline = new RushEndToEndPipeline(config,true);
 
 		for (File file : inputDirectory.listFiles()) {
 			String t = FileUtils.readFileToString(file);
@@ -250,13 +252,17 @@ public class RushEndToEndPipeline {
 
 		// the following two AEs slow down the pipeline significantly when input file
 		// are large
-		/*
-		aggregateBuilder.add(
-		 PolarityCleartkAnalysisEngine.createAnnotatorDescription() );
-		 aggregateBuilder.add(
-		 UncertaintyCleartkAnalysisEngine.createAnnotatorDescription() );
-*/
-		aggregateBuilder.add(AnalysisEngineFactory.createEngineDescription("desc/NegationAnnotator"));
+		if(this.useDefaultForNegationAnnotations) {
+			aggregateBuilder.add(
+					 PolarityCleartkAnalysisEngine.createAnnotatorDescription() );
+					 aggregateBuilder.add(
+					 UncertaintyCleartkAnalysisEngine.createAnnotatorDescription() );
+		}else {
+			aggregateBuilder.add(AnalysisEngineFactory.createEngineDescription("desc/NegationAnnotator"));
+		}
+
+
+		
 
 		// write out the CAS after all the above annotations //Write to Spark Output
 		// context directly from here

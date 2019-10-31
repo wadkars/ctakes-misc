@@ -101,13 +101,20 @@ To create an area in which we can stage our Pig scripts and dependent Jars, we a
 	
 	
 ## Running the Pig Scripts on Sample Data
-First convert all the small files into a smaller set of sequence files
+First convert all the small files into a smaller set of sequence files. Followed by consuming the sequence files and writing them to HIVE. The parameters passed to hive process are
+
+1. Location of the sequence file
+2. Dummy HIVE Table
+3. Actual HIVE Table
+4. Location of the master config files (on all data nodes). This is where the dictionary tables are stored
+5. The location on each data node where the master files from step 4 are copied by each Pig Task and deleted when Pig Task finishes
+6. Boolean flag which indicates which of the two negation modes are used. "True" implies default and "False" implies the "desc/negation" file is used 
 
 	$ cd ~/pig
 	$ export NO_OF_REDUCERS=0
 	$ export FILE_SPLIT_SIZE=40000
 	$ ./convert_to_sequence_files.sh ./sample_data_txt ./sample_data_seq $NO_OF_REDUCERS $FILE_SPLIT_SIZE
-	$ ./process_ctakes_hive.sh ./sample_data_seq/ default.ctakes_annotations_docs_dummy default.ctakes_annotations_docs /tmp/ctakes-config /logs/ctakes-config
+	$ ./process_ctakes_hive.sh ./sample_data_seq/ default.ctakes_annotations_docs_dummy default.ctakes_annotations_docs /tmp/ctakes-config /logs/ctakes-config true
 
 
 

@@ -8,7 +8,7 @@ SET pig.maxCombinedSplitSize 20000;
 set default_parallel 10;
 register /opt/cloudera/parcels/CDH/lib/pig/piggybank.jar;
 register ctakes-misc-4.0.0-jar-with-dependencies.jar
-DEFINE PROCESSPAGE com.cloudera.ctakes.CTakesExtractor('$MASTER_CONFIG_PATH','$TMP_CONFIG_PATH');
+DEFINE PROCESSPAGE com.cloudera.ctakes.CTakesExtractor('$MASTER_CONFIG_PATH','$TMP_CONFIG_PATH','$USE_DEFAULT_NEGATION_ANNOTATORS');
 
 finalTable = LOAD '$DUMMY_HIVE_TBL_NAME' USING org.apache.hive.hcatalog.pig.HCatLoader();
 
