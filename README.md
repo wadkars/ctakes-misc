@@ -46,7 +46,10 @@ We'll also need to add SVN,MVN,GIT to checkout the Apache cTAKES code.
 	$ cd ~/src
 	$ git clone https://github.com/wadkars/ctakes-misc.git
 	$ cd ctakes-misc
-	$ cd ~/src
+	$ mvn clean install
+	$ mkdir /opt/pig
+	$ cp ./target/ctakes-misc-4.0.0-jar-with-dependencies.jar /opt/pig/
+	$ cp ./scripts/* /opt/pig/
 	
 	$ mkdir /tmp/ctakes_config
 	$ cp -r resources/* /tmp/ctakes_config/
