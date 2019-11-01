@@ -8,7 +8,7 @@
 * Run the following command
 
 `
-mvn exec:java -Dexec.mainClass="org.apache.ctakes.pipelines.RushEndToEndPipeline" -Dexec.args="--input-dir /tmp/cTakesExample/cData --output-dir /tmp/cTakesExample/ --masterFolder /tmp/ctakes-config/ --tempMasterFolder /tmp/ctakes-config2/"
+mvn exec:java -Dexec.mainClass="org.apache.ctakes.pipelines.RushEndToEndPipeline" -Dexec.args="--input-dir /tmp/cTakesExample/cData --output-dir /tmp/cTakesExample/ --masterFolder /tmp/ctakes-config/ --tempMasterFolder /tmp/ctakes-config2/" true
 `
 * This will produce two folder /tmp/cTakesExample/xmis and /tmp/cTakesExample/cuis/ and place the respect XMI and CUI's into it.
 
