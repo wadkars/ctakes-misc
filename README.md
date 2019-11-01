@@ -79,7 +79,7 @@ A few sample articles are included in the project under ./sample_data/data .  We
 	$ hdfs dfs -ls ./sample_data_txt
 
 ## Create the following folders on all datanodes in the cluster
-
+All of the folders below must have 777 permissions set on them on each data node
 
 	$ mkdir /tmp/random
 	$ mkdir /tmp/ctakes-config
