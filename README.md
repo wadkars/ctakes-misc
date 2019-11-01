@@ -78,9 +78,36 @@ A few sample articles are included in the project under ./sample_data/data .  We
 ## Create the following folders on all datanodes in the cluster
 
 
-
 	$ mkdir /tmp/random
+	$ mkdir /tmp/ctakes-config
 	$ mkdir /logs/ctakes-config
+	
+
+	
+1. Folder 1 is needed because the Files Collections Reader used inside the source code needs a folder to look into. It is a dummy folder. Leave it empty. Filling it with a lot of files slows down the process as the Reader 
+lists all the files.
+
+2. Folder 2 is the folder where all the config files for LVG Annotator and the Lookup Annotators are placed. These should be copied from ./resources/ folder of the project. Simply copy the entire folder contents into the /tmp/ctakes-config folder. Copy this from the edge-node /tmp/ctakes-config in the installation steps above.
+
+3. Folder 3 should be created on a disk with enough space. This is the folder in which each Pig Task creates a subfolder (with a randomly generated number) and copies all the contents of the /tmp/ctakes-config into. When the Pig Task finishes it cleans up the sub-folder created. This is needed because the HSQLDB stored in the lookup dictionary paths creates a lock file which cannot be reused and multiple pig tasks running on the same data-node endup failing on this lock file if we use the /tmp/ctakes-config folder.
+
+## Changing the custom dictionary
+
+1. The Dictionary in maintained in the ${PROJECT_HOME}/resources/lookupdict/sno_rx_16ab/sno_rx_16ab.script . Also note the .properties file with the same name in the same folder
+
+2. It is referenced from ${PROJECT_HOME}/resources/sno_rx_16ab-test.xml. If you create another similar script file, remember to change the references in this XML
+
+3. Also remember to copy the contents of the ${PROJECT_HOME}/resources/ folder into /tmp/ctakes-config on all the nodes after doing that
+
+## Changing the Pipeline
+
+1. Most of the pipeline configuration is in the class RushEndToEndPipeline.java. The method is getXMIWritingPreprocessorAggregateBuilder().
+
+2. The CUIS extraction happens in the following two classes:
+   a. RushSimplePipeline.java
+   b. CuisWriter.java
+
+
 
 ## Copy /tmp/ctakes_config to all datanodes in the cluster
 
@@ -125,4 +152,8 @@ The pig job will run to completion and let you know that 10 records were written
 	<cuis and annotations here>
 	Time taken: 11.106 seconds, Fetched: 10 row(s)
 
+## Additional Considerations
 
+1. The raw files to sequence file generation takes a parameter $NO_OF_REDUCERS. You can leave it as zero and this will produce as many files as the raw files. One of each raw file with multiple paths defined by the split size (default is 40KB)
+
+2. It will help to run it with number of reducers 250 as the default. If you get timeout errors try to break the raw files into batches and run the above process twice, once for each batch.
