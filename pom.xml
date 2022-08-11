@@ -29,7 +29,7 @@
 		<skipTests>true</skipTests>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<pig.version>0.17.0</pig.version>
-		<hadoop.version>3.0.0-cdh6.0.0</hadoop.version>
+		<hadoop.version>3.2.4</hadoop.version>
 		<joda.version>2.2</joda.version>
 	</properties>
 	<parent>
